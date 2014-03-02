@@ -28,9 +28,13 @@ public:
 	Customer* getNextCustomerFromQueue(int customerType);
 	Seat* assignSeatToCustomer(Customer* customer);
 	bool soldOut();
+	void addSeller();
+	void removeSeller();
 	void printSeats();
 
+	int activeSellers;
 	int availableSeats;
+	int soldSeats;
 	int unseatedCustomers;
 	
 private:
@@ -44,9 +48,11 @@ private:
 	pthread_mutex_t queueMMutex;
 	pthread_mutex_t queueLMutex;
 	pthread_mutex_t seatMutex;
+	pthread_mutex_t sellerMutex;
 	int seatHRow;
 	int seatHCol;
 	int seatMRow;
+	int seatMRowDec;
 	int seatMCol;
 	int seatLRow;
 	int seatLCol;

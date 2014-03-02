@@ -30,11 +30,12 @@ void *Customer::main(void* context)
 	{
 		if(theatre->soldOut() && _this->seat == NULL)
 		{
+			_this->quit = true;
 			_this->leaveQueue();
 			break;
 		}
 		
-		sleep(1);
+		usleep(100000); // Wait for awhile to avoid hogging the cpu
 	}
 	
 	output("End customer %s\n", _this->name.c_str());

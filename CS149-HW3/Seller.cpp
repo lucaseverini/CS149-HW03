@@ -25,10 +25,13 @@ void *Seller::main(void* context)
 	
 	output("Start seller %s\n", _this->name.c_str());
 	
+	theatre->addSeller();
+	
 	while(!_this->quit)
 	{
 		if(theatre->soldOut())
 		{
+			_this->quit = true;
 			break;
 		}
 		
@@ -42,7 +45,9 @@ void *Seller::main(void* context)
 			sleep(1); 
 		}
 	}
-	
+
+	theatre->removeSeller();
+
 	output("End seller %s\n", _this->name.c_str());
 
 	return NULL;
@@ -112,13 +117,13 @@ void Seller::sellTicketToCustomer(Customer* customer)
 				break;
 		}
 		
+		assignedSeat->seller = this;
+		customer->seat = assignedSeat;
+
 		sleep(sleepVal);
 
 		output("Seller %s sold ticket to customer %s in %d second(s)\n", name.c_str(), customer->name.c_str(), sleepVal);		
 		output("Available seats: %d\n", theatre->availableSeats);
-
-		assignedSeat->seller = this;
-		customer->seat = assignedSeat;
 	}
 }
 

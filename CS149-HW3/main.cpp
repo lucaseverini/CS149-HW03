@@ -23,23 +23,47 @@ int main(int argc, const char * argv[])
 {
 	vector<Seller*> sellers;
 	vector<Customer*> customers;
-	int customersForSeller = 5;		// 5, 10 or 15
-	int runTime = 60;				// 60
+	int customersForSeller = 70;
+	int runTime = 300;
+	int seatCols = 20;
+	int seatRows = 30;
+	int totSeats = 0;
 	int totCustomers = 0;
 	
-	if(argc == 2)
+	for(int idx = 1; idx < argc; idx++)
 	{
-		customersForSeller = atoi(argv[1]);
+		if(idx == 1)
+		{
+			customersForSeller = atoi(argv[idx]);
+		}
+		else if(idx == 2)
+		{
+			runTime = atoi(argv[idx]);
+		}
+		else if(idx == 3)
+		{
+			seatCols = atoi(argv[idx]);
+		}
+		else if(idx == 4)
+		{
+			seatRows = atoi(argv[idx]);
+		}
 	}
+	
+	totSeats = seatCols * seatRows;
+	totCustomers = customersForSeller * 10;
 
 	output("CS149 Assignment 3\n");
-	output("Team: Kamikaze\n");
+	output("March-2-2014\n");
+	output("Team: Kamikaze\n\n");
+	output("Theatre with %d seats (%dx%d)\n", totSeats, seatCols, seatRows);
 	output("%d customer(s) for seller\n", customersForSeller);
-	output("Runs for %d second(s)\n", runTime);
+	output("Total customers: %d\n", totCustomers);
+	output("Run-time %d second(s)\n", runTime);
 
 	srand((unsigned int)time(NULL));
 	
-	theatre = new Theatre(10, 10);
+	theatre = new Theatre(seatRows, seatCols);
 			
 	theatre->printSeats();
 
@@ -54,9 +78,6 @@ int main(int argc, const char * argv[])
 	sellers.push_back(new Seller(3, 4));
 	sellers.push_back(new Seller(3, 5));
 	sellers.push_back(new Seller(3, 6));
-
-	totCustomers = customersForSeller * 10;
-	output("Customers to seat: %d\n", totCustomers);
 
 	for(int idx = 1; idx <= customersForSeller; idx++)
 	{
@@ -76,10 +97,25 @@ int main(int argc, const char * argv[])
 		totCustomers++;
 	}
 
-	sleep(runTime);
+	output("Sale started\n");
 
+	for(int idx = runTime; idx > 0; idx--)
+	{
+		output("%d second(s) to the end...\n", idx);
+		sleep(1);
+		
+		if(theatre->activeSellers == 0)
+		{
+			output("All seats have been sold\n");
+			break;
+		}
+	}
+	
+	output("Sale terminated\n");
+	
 	theatre->printSeats();
 	
+	output("Sold seats: %d\n", theatre->soldSeats);
 	output("Unseated customers: %d\n", theatre->unseatedCustomers);
 	
 	for(vector<Seller*>::const_reverse_iterator iter = sellers.crbegin(); iter != sellers.crend(); iter++)
@@ -93,8 +129,6 @@ int main(int argc, const char * argv[])
 	}
 
 	delete theatre;
-	
-	sleep(3);
 	
 	output("Done.\n");
 

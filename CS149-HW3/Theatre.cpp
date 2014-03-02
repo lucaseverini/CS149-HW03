@@ -25,12 +25,15 @@ using namespace std;
 Theatre::Theatre(int seatRows, int seatCols)
 :	rows(seatRows),
 	cols(seatCols),
+	activeSellers(0),
 	availableSeats(seatRows * seatCols),
+	soldSeats(0),
 	seatHRow(0),
 	seatHCol(0),
-	seatMRow(5),
+	seatMRow((seatRows - 1) / 2),
+	seatMRowDec(1),
 	seatMCol(0),
-	seatLRow(9),
+	seatLRow(seatRows - 1),
 	seatLCol(0),
 	unseatedCustomers(0)
 {
@@ -66,6 +69,12 @@ Theatre::Theatre(int seatRows, int seatCols)
 	{
 		perror("Theatre::queueLMutex not initialized");
 	}
+
+	result = pthread_mutex_init(&sellerMutex, NULL);
+	if(result != 0)
+	{
+		perror("Theatre::sellerMutex not initialized");
+	}
 }
 
 Theatre::~Theatre()
@@ -74,6 +83,7 @@ Theatre::~Theatre()
 	pthread_mutex_destroy(&queueMMutex);
 	pthread_mutex_destroy(&queueLMutex);
 	pthread_mutex_destroy(&seatMutex);
+	pthread_mutex_destroy(&sellerMutex);
 
 	for(int row = 0; row < rows; row++)
 	{
@@ -272,16 +282,17 @@ Seat* Theatre::assignSeatToCustomer(Customer* customer)
 	{
 		switch(customer->type)
 		{
+			// H rows
 			case 1:
 			{
 				do
 				{
 					assignedSeat = seats[INDEX(seatHRow, seatHCol)];
 				
-					if(++seatHCol == 10)
+					if(++seatHCol == cols)
 					{
 						seatHCol = 0;
-						if(++seatHRow == 10)
+						if(++seatHRow == rows)
 						{
 							break;
 						}
@@ -293,59 +304,30 @@ Seat* Theatre::assignSeatToCustomer(Customer* customer)
 				{
 					assignedSeat->customer = customer;
 
+					soldSeats++;
 					availableSeats--;
 				}
 			}
 				break;
 				
+			// M rows
 			case 2:
 			{
 				do
 				{
 					assignedSeat = seats[INDEX(seatMRow, seatMCol)];
 				
-					if(++seatMCol == 10)
+					if(++seatMCol == cols)
 					{
 						seatMCol = 0;
 						
-						switch(seatMRow)
+						seatMRow -= seatMRowDec % 2 == 0 ? seatMRowDec : -seatMRowDec;
+						if(seatMRow < 0)
 						{
-							case 5:
-								seatMRow = 6;
-								break;
-								
-							case 6:
-								seatMRow = 4;
-								break;
-
-							case 4:
-								seatMRow = 7;
-								break;
-
-							case 7:
-								seatMRow = 3;
-								break;
-
-							case 3:
-								seatMRow = 8;
-								break;
-								
-							case 8:
-								seatMRow = 2;
-								break;
-
-							case 2:
-								seatMRow = 9;
-								break;
-
-							case 9:
-								seatMRow = 1;
-								break;
-
-							case 1:
-								seatMRow = 1;
-								break;
+							break;
 						}
+
+						seatMRowDec++;
 					}
 				}
 				while(assignedSeat == NULL || assignedSeat->customer != NULL);
@@ -354,18 +336,20 @@ Seat* Theatre::assignSeatToCustomer(Customer* customer)
 				{
 					assignedSeat->customer = customer;
 					
+					soldSeats++;
 					availableSeats--;
 				}
 			}
 				break;
 				
+			// L rows
 			case 3:
 			{
 				do
 				{
 					assignedSeat = seats[INDEX(seatLRow, seatLCol)];
 					
-					if(++seatLCol == 10)
+					if(++seatLCol == cols)
 					{
 						seatLCol = 0;
 						if(--seatLRow == -1)
@@ -380,6 +364,7 @@ Seat* Theatre::assignSeatToCustomer(Customer* customer)
 				{
 					assignedSeat->customer = customer;
 					
+					soldSeats++;
 					availableSeats--;
 				}
 			}
@@ -408,6 +393,24 @@ void Theatre::printSeats()
 	}
 	
 	output("%s", outStream.str().c_str());
+}
+
+void Theatre::addSeller()
+{
+	pthread_mutex_lock(&sellerMutex);
+	
+	activeSellers++;
+	
+	pthread_mutex_unlock(&sellerMutex);
+}
+
+void Theatre::removeSeller()
+{
+	pthread_mutex_lock(&sellerMutex);
+	
+	activeSellers--;
+	
+	pthread_mutex_unlock(&sellerMutex);
 }
 
 
