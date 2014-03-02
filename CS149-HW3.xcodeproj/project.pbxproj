@@ -8,7 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		81C1B17918C1767A00B949D1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81C1B17818C1767A00B949D1 /* main.cpp */; };
-		81C1B17B18C1767A00B949D1 /* CS149_HW3.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 81C1B17A18C1767A00B949D1 /* CS149_HW3.1 */; };
+		81C1B18318C176BA00B949D1 /* Seller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81C1B18118C176BA00B949D1 /* Seller.cpp */; };
+		81C1B18618C176C900B949D1 /* Customer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81C1B18418C176C900B949D1 /* Customer.cpp */; };
+		81C1B18918C26D5E00B949D1 /* Output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81C1B18818C26D5E00B949D1 /* Output.cpp */; };
+		81C1B18C18C2705A00B949D1 /* Theatre.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81C1B18A18C2705A00B949D1 /* Theatre.cpp */; };
+		81C1B19018C28FDA00B949D1 /* Seat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81C1B18E18C28FD900B949D1 /* Seat.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -18,7 +22,6 @@
 			dstPath = /usr/share/man/man1/;
 			dstSubfolderSpec = 0;
 			files = (
-				81C1B17B18C1767A00B949D1 /* CS149_HW3.1 in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
@@ -27,7 +30,17 @@
 /* Begin PBXFileReference section */
 		81C1B17518C1767A00B949D1 /* CS149-HW3 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "CS149-HW3"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81C1B17818C1767A00B949D1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		81C1B17A18C1767A00B949D1 /* CS149_HW3.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = CS149_HW3.1; sourceTree = "<group>"; };
+		81C1B18118C176BA00B949D1 /* Seller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Seller.cpp; sourceTree = "<group>"; };
+		81C1B18218C176BA00B949D1 /* Seller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Seller.h; sourceTree = "<group>"; };
+		81C1B18418C176C900B949D1 /* Customer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Customer.cpp; sourceTree = "<group>"; };
+		81C1B18518C176C900B949D1 /* Customer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Customer.h; sourceTree = "<group>"; };
+		81C1B18718C185CB00B949D1 /* Output.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Output.h; sourceTree = "<group>"; };
+		81C1B18818C26D5E00B949D1 /* Output.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Output.cpp; sourceTree = "<group>"; };
+		81C1B18A18C2705A00B949D1 /* Theatre.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Theatre.cpp; sourceTree = "<group>"; };
+		81C1B18B18C2705A00B949D1 /* Theatre.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Theatre.h; sourceTree = "<group>"; };
+		81C1B18D18C280FB00B949D1 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
+		81C1B18E18C28FD900B949D1 /* Seat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Seat.cpp; sourceTree = "<group>"; };
+		81C1B18F18C28FD900B949D1 /* Seat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Seat.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,8 +73,18 @@
 		81C1B17718C1767A00B949D1 /* CS149-HW3 */ = {
 			isa = PBXGroup;
 			children = (
+				81C1B18D18C280FB00B949D1 /* main.h */,
 				81C1B17818C1767A00B949D1 /* main.cpp */,
-				81C1B17A18C1767A00B949D1 /* CS149_HW3.1 */,
+				81C1B18218C176BA00B949D1 /* Seller.h */,
+				81C1B18118C176BA00B949D1 /* Seller.cpp */,
+				81C1B18518C176C900B949D1 /* Customer.h */,
+				81C1B18418C176C900B949D1 /* Customer.cpp */,
+				81C1B18B18C2705A00B949D1 /* Theatre.h */,
+				81C1B18A18C2705A00B949D1 /* Theatre.cpp */,
+				81C1B18F18C28FD900B949D1 /* Seat.h */,
+				81C1B18E18C28FD900B949D1 /* Seat.cpp */,
+				81C1B18718C185CB00B949D1 /* Output.h */,
+				81C1B18818C26D5E00B949D1 /* Output.cpp */,
 			);
 			path = "CS149-HW3";
 			sourceTree = "<group>";
@@ -117,6 +140,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81C1B19018C28FDA00B949D1 /* Seat.cpp in Sources */,
+				81C1B18918C26D5E00B949D1 /* Output.cpp in Sources */,
+				81C1B18618C176C900B949D1 /* Customer.cpp in Sources */,
+				81C1B18318C176BA00B949D1 /* Seller.cpp in Sources */,
+				81C1B18C18C2705A00B949D1 /* Theatre.cpp in Sources */,
 				81C1B17918C1767A00B949D1 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
