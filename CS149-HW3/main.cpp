@@ -23,8 +23,8 @@ int main(int argc, const char * argv[])
 {
 	vector<Seller*> sellers;
 	vector<Customer*> customers;
-	int customersForSeller = 15;	// 5, 10 or 15
-	int runTime = 120;				// 60
+	int customersForSeller = 5;		// 5, 10 or 15
+	int runTime = 60;				// 60
 	int totCustomers = 0;
 	
 	if(argc == 2)
