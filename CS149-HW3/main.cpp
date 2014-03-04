@@ -23,10 +23,12 @@ int main(int argc, const char * argv[])
 {
 	vector<Seller*> sellers;
 	vector<Customer*> customers;
-	int customersForSeller = 70;
-	int runTime = 300;
-	int seatCols = 20;
-	int seatRows = 30;
+	int customersForSeller = 15;
+	int runTime = 120;
+	int seatCols = 10;
+	int seatRows = 10;
+	int maxWaitTime = 10;
+	
 	int totSeats = 0;
 	int totCustomers = 0;
 	
@@ -47,6 +49,10 @@ int main(int argc, const char * argv[])
 		else if(idx == 4)
 		{
 			seatRows = atoi(argv[idx]);
+		}
+		else if(idx == 5)
+		{
+			maxWaitTime = atoi(argv[idx]);
 		}
 	}
 	
@@ -81,19 +87,19 @@ int main(int argc, const char * argv[])
 
 	for(int idx = 1; idx <= customersForSeller; idx++)
 	{
-		customers.push_back(new Customer(1, idx));
+		customers.push_back(new Customer(1, idx, maxWaitTime));
 		totCustomers++;
 	}
 	
 	for(int idx = 1; idx <= customersForSeller * 3; idx++)
 	{
-		customers.push_back(new Customer(2, idx));
+		customers.push_back(new Customer(2, idx, maxWaitTime));
 		totCustomers++;
 	}
 
 	for(int idx = 1; idx <= customersForSeller * 6; idx++)
 	{
-		customers.push_back(new Customer(3, idx));
+		customers.push_back(new Customer(3, idx, maxWaitTime));
 		totCustomers++;
 	}
 
@@ -116,7 +122,25 @@ int main(int argc, const char * argv[])
 	theatre->printSeats();
 	
 	output("Sold seats: %d\n", theatre->soldSeats);
-	output("Unseated customers: %d\n", theatre->unseatedCustomers);
+	
+	int unseatedCustomers = 0;
+	int unhappyCustomers = 0;
+	for(vector<Customer*>::const_iterator iter = customers.begin(); iter != customers.end(); iter++)
+	{
+		if((*iter)->seat == NULL)
+		{
+			if((*iter)->waitTime >= maxWaitTime)
+			{
+				unhappyCustomers++;
+			}
+			else
+			{
+				unseatedCustomers++;
+			}
+		}
+	}
+	output("Unseated customers: %d\n", unseatedCustomers);
+	output("Customers who waited %d second(s) or more: %d\n", maxWaitTime, unhappyCustomers);
 	
 	for(vector<Seller*>::const_reverse_iterator iter = sellers.crbegin(); iter != sellers.crend(); iter++)
 	{

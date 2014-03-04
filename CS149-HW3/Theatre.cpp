@@ -34,8 +34,7 @@ Theatre::Theatre(int seatRows, int seatCols)
 	seatMRowDec(1),
 	seatMCol(0),
 	seatLRow(seatRows - 1),
-	seatLCol(0),
-	unseatedCustomers(0)
+	seatLCol(0)
 {
 	seats = (Seat**)malloc(sizeof(Seat*) * (rows * cols));
 	for(int row = 0; row < rows; row++)
@@ -140,12 +139,6 @@ void Theatre::removeCustomerFromQueue(Customer& customer)
 				if((*iter)->threadId == customer.threadId)
 				{
 					queueH.erase(iter);
-
-					pthread_mutex_lock(&seatMutex);
-					
-					unseatedCustomers++;
-					
-					pthread_mutex_unlock(&seatMutex);
 					
 					output("Customer %s left queue H\n",customer.name.c_str());
 					break;
@@ -163,13 +156,7 @@ void Theatre::removeCustomerFromQueue(Customer& customer)
 				if((*iter)->threadId == customer.threadId)
 				{
 					queueM.erase(iter);
-					
-					pthread_mutex_lock(&seatMutex);
-					
-					unseatedCustomers++;
-					
-					pthread_mutex_unlock(&seatMutex);
-					
+										
 					output("Customer %s left queue M\n",customer.name.c_str());
 					break;
 				}
@@ -186,12 +173,6 @@ void Theatre::removeCustomerFromQueue(Customer& customer)
 				if((*iter)->threadId == customer.threadId)
 				{
 					queueL.erase(iter);
-					
-					pthread_mutex_lock(&seatMutex);
-					
-					unseatedCustomers++;
-					
-					pthread_mutex_unlock(&seatMutex);
 					
 					output("Customer %s left queue L\n",customer.name.c_str());
 					break;

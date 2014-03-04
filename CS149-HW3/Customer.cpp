@@ -25,28 +25,60 @@ void *Customer::main(void* context)
 	_this->sleepForAwhile();
 	
 	_this->goInQueue();
+		
+	output("Customer %s is waiting...\n", _this->name.c_str());
 	
-	while(_this->seat == NULL && !_this->quit)
+	time_t startTime = time(NULL);
+	time_t curTime = time(NULL);
+	
+	while(!_this->quit)
 	{
+		curTime = time(NULL);
+
+		if(_this->maxWaitTime != 0)
+		{
+			if(curTime - startTime >= _this->maxWaitTime && _this->seat == NULL)
+			{
+				_this->waitTime = (int)(curTime - startTime);
+				_this->quit = true;
+				_this->leaveQueue();
+
+				output("Customer %s waited %d seconds and left\n", _this->name.c_str(), curTime - startTime);
+				break;
+			}
+		}
+		
 		if(theatre->soldOut() && _this->seat == NULL)
 		{
+			_this->waitTime = (int)(curTime - startTime);
 			_this->quit = true;
 			_this->leaveQueue();
 			break;
 		}
 		
-		usleep(100000); // Wait for awhile to avoid hogging the cpu
+		if(_this->seat != NULL)
+		{
+			_this->waitTime = (int)(curTime - startTime);
+			break;
+		}
+		
+		// Wait for awhile to avoid hogging the cpu
+		sleep(1);
+		//usleep(100000);
 	}
-	
+	_this->waitTime = (int)(curTime - startTime);
+
 	output("End customer %s\n", _this->name.c_str());
 
 	return NULL;
 }
 
-Customer::Customer(int type, int index)
+Customer::Customer(int type, int index, int maxWaitTime)
 :	type(type),
 	quit(false),
-	seat(NULL)
+	seat(NULL),
+	waitTime(0),
+	maxWaitTime(maxWaitTime)
 {
 	char str[10];
 	

@@ -18,7 +18,7 @@ class Seat;
 class Customer
 {
 public:
-	Customer(int type, int index);
+	Customer(int type, int index, int maxWaitTime = 0);
 	~Customer();
 		
 	void wait(int time);
@@ -37,6 +37,8 @@ public:
 	bool quit;
 	string name;
 	Seat* seat;
+	int waitTime;
+	int maxWaitTime;
 };
 
 #endif /* defined(__CS149_HW3__Customer__) */

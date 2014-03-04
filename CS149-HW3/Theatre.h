@@ -35,7 +35,6 @@ public:
 	int activeSellers;
 	int availableSeats;
 	int soldSeats;
-	int unseatedCustomers;
 	
 private:
 	int rows;

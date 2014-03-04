@@ -28,6 +28,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		817431AC18C529B300F8C2BE /* Assignment3.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = Assignment3.pdf; sourceTree = "<group>"; };
 		81C1B17518C1767A00B949D1 /* CS149-HW3 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "CS149-HW3"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81C1B17818C1767A00B949D1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		81C1B18118C176BA00B949D1 /* Seller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Seller.cpp; sourceTree = "<group>"; };
@@ -57,6 +58,7 @@
 		81C1B16C18C1767A00B949D1 = {
 			isa = PBXGroup;
 			children = (
+				817431AC18C529B300F8C2BE /* Assignment3.pdf */,
 				81C1B17718C1767A00B949D1 /* CS149-HW3 */,
 				81C1B17618C1767A00B949D1 /* Products */,
 			);
@@ -79,10 +81,10 @@
 				81C1B18118C176BA00B949D1 /* Seller.cpp */,
 				81C1B18518C176C900B949D1 /* Customer.h */,
 				81C1B18418C176C900B949D1 /* Customer.cpp */,
-				81C1B18B18C2705A00B949D1 /* Theatre.h */,
-				81C1B18A18C2705A00B949D1 /* Theatre.cpp */,
 				81C1B18F18C28FD900B949D1 /* Seat.h */,
 				81C1B18E18C28FD900B949D1 /* Seat.cpp */,
+				81C1B18B18C2705A00B949D1 /* Theatre.h */,
+				81C1B18A18C2705A00B949D1 /* Theatre.cpp */,
 				81C1B18718C185CB00B949D1 /* Output.h */,
 				81C1B18818C26D5E00B949D1 /* Output.cpp */,
 			);
@@ -253,6 +255,7 @@
 				81C1B18018C1767A00B949D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
