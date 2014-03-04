@@ -21,13 +21,17 @@ Theatre* theatre;
 
 int main(int argc, const char * argv[])
 {
+	output("CS149 Assignment 3\n");
+	output("March-4-2014\n");
+	output("Team: Kamikaze\n\n");
+
 	vector<Seller*> sellers;
 	vector<Customer*> customers;
-	int customersForSeller = 15;
-	int runTime = 120;
-	int seatCols = 10;
-	int seatRows = 10;
-	int maxWaitTime = 10;
+	int customersForSeller = 70;
+	int runTime = 420;
+	int seatCols = 30;
+	int seatRows = 20;
+	int maxWaitTime = 270;
 	
 	int totSeats = 0;
 	int totCustomers = 0;
@@ -59,12 +63,10 @@ int main(int argc, const char * argv[])
 	totSeats = seatCols * seatRows;
 	totCustomers = customersForSeller * 10;
 
-	output("CS149 Assignment 3\n");
-	output("March-2-2014\n");
-	output("Team: Kamikaze\n\n");
 	output("Theatre with %d seats (%dx%d)\n", totSeats, seatCols, seatRows);
 	output("%d customer(s) for seller\n", customersForSeller);
 	output("Total customers: %d\n", totCustomers);
+	output("Max. customer waiting in line: %d second(s)\n", maxWaitTime);
 	output("Run-time %d second(s)\n", runTime);
 
 	srand((unsigned int)time(NULL));
@@ -75,7 +77,6 @@ int main(int argc, const char * argv[])
 
 	output("Creating Sellers...\n");
 	sellers.push_back(new Seller(1, 1));
-
 	sellers.push_back(new Seller(2, 1));
 	sellers.push_back(new Seller(2, 2));
 	sellers.push_back(new Seller(2, 3));
@@ -89,19 +90,16 @@ int main(int argc, const char * argv[])
 	for(int idx = 1; idx <= customersForSeller; idx++)
 	{
 		customers.push_back(new Customer(1, idx, maxWaitTime));
-		totCustomers++;
 	}
 
 	for(int idx = 1; idx <= customersForSeller * 3; idx++)
 	{
 		customers.push_back(new Customer(2, idx, maxWaitTime));
-		totCustomers++;
 	}
 
 	for(int idx = 1; idx <= customersForSeller * 6; idx++)
 	{
 		customers.push_back(new Customer(3, idx, maxWaitTime));
-		totCustomers++;
 	}
 
 	output("Sale started\n");
@@ -109,11 +107,26 @@ int main(int argc, const char * argv[])
 	for(int idx = runTime; idx > 0; idx--)
 	{
 		output("%d second(s) to the end...\n", idx);
+		
 		sleep(1);
 		
 		if(theatre->activeSellers == 0)
 		{
 			output("All seats have been sold\n");
+
+			theatre->sellTerminated = true;
+			theatre->sendWaitingCustomersAway();
+			theatre->releaseSellers();
+			break;
+		}
+
+		if(theatre->processedCustomers == totCustomers)
+		{
+			output("All expected customers have been queued\n");
+
+			theatre->sellTerminated = true;
+			theatre->sendWaitingCustomersAway();
+			theatre->releaseSellers();
 			break;
 		}
 	}

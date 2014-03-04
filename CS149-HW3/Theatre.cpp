@@ -34,7 +34,9 @@ Theatre::Theatre(int seatRows, int seatCols)
 	seatMRowDec(1),
 	seatMCol(0),
 	seatLRow(seatRows - 1),
-	seatLCol(0)
+	seatLCol(0),
+	processedCustomers(0),
+	sellTerminated(false)
 {
 	seats = (Seat**)malloc(sizeof(Seat*) * (rows * cols));
 	for(int row = 0; row < rows; row++)
@@ -92,6 +94,12 @@ Theatre::Theatre(int seatRows, int seatCols)
 	{
 		perror("Theatre::sellerMutex not initialized");
 	}
+
+	result = pthread_mutex_init(&customersMutex, NULL);
+	if(result != 0)
+	{
+		perror("Theatre::customersMutex not initialized");
+	}
 }
 
 Theatre::~Theatre()
@@ -104,6 +112,7 @@ Theatre::~Theatre()
 	pthread_cond_destroy(&queueLCondition);
 	pthread_mutex_destroy(&seatMutex);
 	pthread_mutex_destroy(&sellerMutex);
+	pthread_mutex_destroy(&customersMutex);
 
 	for(int row = 0; row < rows; row++)
 	{
@@ -213,6 +222,12 @@ void Theatre::removeCustomerFromQueue(Customer& customer)
 			pthread_mutex_unlock(&queueLMutex);
 			break;
 	}
+	
+	pthread_mutex_lock(&customersMutex);
+	
+	processedCustomers++;
+	
+	pthread_mutex_unlock(&customersMutex);
 }
 
 Customer* Theatre::getNextCustomerFromQueue(int customerType)
@@ -228,6 +243,10 @@ Customer* Theatre::getNextCustomerFromQueue(int customerType)
 			{
 				customer = queueH.front();
 				queueH.pop_front();
+
+				pthread_mutex_lock(&customersMutex);
+				processedCustomers++;
+				pthread_mutex_unlock(&customersMutex);
 			}
 			else
 			{
@@ -244,6 +263,10 @@ Customer* Theatre::getNextCustomerFromQueue(int customerType)
 			{
 				customer = queueM.front();
 				queueM.pop_front();
+
+				pthread_mutex_lock(&customersMutex);
+				processedCustomers++;
+				pthread_mutex_unlock(&customersMutex);
 			}
 			else
 			{
@@ -260,6 +283,10 @@ Customer* Theatre::getNextCustomerFromQueue(int customerType)
 			{
 				customer = queueL.front();
 				queueL.pop_front();
+
+				pthread_mutex_lock(&customersMutex);
+				processedCustomers++;
+				pthread_mutex_unlock(&customersMutex);
 			}
 			else
 			{
@@ -385,12 +412,7 @@ Seat* Theatre::assignSeatToCustomer(Customer* customer)
 	}
 	   
 	pthread_mutex_unlock(&seatMutex);
-	
-	if(availableSeats == 0)
-	{
-		sendCustomersAway();
-	}
-	
+		
 	return assignedSeat;
 }
 
@@ -430,7 +452,7 @@ void Theatre::removeSeller()
 	pthread_mutex_unlock(&sellerMutex);
 }
 
-void Theatre::sendCustomersAway()
+void Theatre::sendWaitingCustomersAway()
 {
 	output("Theatre sold out. Send all waiting customers away...\n");
 
@@ -456,8 +478,22 @@ void Theatre::sendCustomersAway()
 	}
 }
 
+void Theatre::releaseSellers()
+{
+	output("Theatre sold out. Release all sellers...\n");
+	
+	pthread_mutex_lock(&queueHMutex);
+	pthread_cond_broadcast(&queueHCondition);
+	pthread_mutex_unlock(&queueHMutex);
 
+	pthread_mutex_lock(&queueMMutex);
+	pthread_cond_broadcast(&queueMCondition);
+	pthread_mutex_unlock(&queueMMutex);
 
+	pthread_mutex_lock(&queueLMutex);
+	pthread_cond_broadcast(&queueLCondition);
+	pthread_mutex_unlock(&queueLMutex);
+}
 
 
 

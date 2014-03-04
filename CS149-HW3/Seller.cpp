@@ -41,7 +41,7 @@ void *Seller::main(void* context)
 			customer = theatre->getNextCustomerFromQueue(_this->type);
 		}
 		
-		if(theatre->soldOut())
+		if(theatre->soldOut() || theatre->sellTerminated)
 		{
 			_this->quit = true;
 			break;

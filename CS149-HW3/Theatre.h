@@ -31,14 +31,16 @@ public:
 	void addSeller();
 	void removeSeller();
 	void printSeats();
+	void sendWaitingCustomersAway();
+	void releaseSellers();
 
 	int activeSellers;
 	int availableSeats;
 	int soldSeats;
+	int processedCustomers;
+	bool sellTerminated;
 	
 private:
-	void sendCustomersAway();
-	
 	int rows;
 	int cols;
 	Seat* *seats;
@@ -61,6 +63,7 @@ public:
 	pthread_cond_t queueLCondition;
 	pthread_mutex_t seatMutex;
 	pthread_mutex_t sellerMutex;
+	pthread_mutex_t customersMutex;
 };
 
 #endif /* defined(__CS149_HW3__Theatre__) */

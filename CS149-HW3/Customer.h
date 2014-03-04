@@ -44,4 +44,6 @@ public:
 	pthread_cond_t waitCondition;
 };
 
+static int clock_gettime(struct timespec *ts);
+
 #endif /* defined(__CS149_HW3__Customer__) */
