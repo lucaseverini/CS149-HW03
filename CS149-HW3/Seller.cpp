@@ -25,24 +25,26 @@ void *Seller::main(void* context)
 	
 	output("Start seller %s\n", _this->name.c_str());
 	
-	theatre->addSeller();
+	_this->setup();
 	
-	while(!_this->quit)
+	while(true)
 	{
+		pthread_mutex_lock(_this->waitMutex);
+		pthread_cond_wait(_this->waitCondition, _this->waitMutex);
+		pthread_mutex_unlock(_this->waitMutex);
+		
+		Customer* customer = theatre->getNextCustomerFromQueue(_this->type);
+		while(customer != NULL)
+		{
+			_this->sellTicketToCustomer(customer);
+	
+			customer = theatre->getNextCustomerFromQueue(_this->type);
+		}
+		
 		if(theatre->soldOut())
 		{
 			_this->quit = true;
 			break;
-		}
-		
-		Customer* customer = theatre->getNextCustomerFromQueue(_this->type);
-		if(customer != NULL)
-		{
-			_this->sellTicketToCustomer(customer);
-		}
-		else
-		{
-			sleep(1); 
 		}
 	}
 
@@ -84,15 +86,15 @@ Seller::Seller(int type, int index)
 		perror("Seller::pthread_create not created");
 	}
 
-	output("Seller %s created\n", name.c_str());
+	// output("Seller %s created\n", name.c_str());
 }
 
 Seller::~Seller()
 {
 	quit = true;
 	pthread_join(this->threadId, NULL);
-	
-	output("Seller %s deleted\n", name.c_str());
+
+	// output("Seller %s deleted\n", name.c_str());
 }
 
 void Seller::sellTicketToCustomer(Customer* customer)
@@ -124,9 +126,35 @@ void Seller::sellTicketToCustomer(Customer* customer)
 
 		output("Seller %s sold ticket to customer %s in %d second(s)\n", name.c_str(), customer->name.c_str(), sleepVal);		
 		output("Available seats: %d\n", theatre->availableSeats);
+		
+		pthread_mutex_lock(&customer->waitMutex);
+		pthread_cond_signal(&customer->waitCondition);
+		pthread_mutex_unlock(&customer->waitMutex);
 	}
 }
 
+void Seller::setup()
+{
+	switch(type)
+	{
+		case 1:
+			waitMutex = &theatre->queueHMutex;
+			waitCondition = &theatre->queueHCondition;
+			break;
+
+		case 2:
+			waitMutex = &theatre->queueMMutex;
+			waitCondition = &theatre->queueMCondition;
+			break;
+
+		case 3:
+			waitMutex = &theatre->queueLMutex;
+			waitCondition = &theatre->queueLCondition;
+			break;
+	}
+	
+	theatre->addSeller();
+}
 
 
 

@@ -26,48 +26,43 @@ void *Customer::main(void* context)
 	
 	_this->goInQueue();
 		
-	output("Customer %s is waiting...\n", _this->name.c_str());
-	
+	output("Customer %s is waiting in line...\n", _this->name.c_str());
+			
+	pthread_mutex_lock(&_this->waitMutex);
+
 	time_t startTime = time(NULL);
 	time_t curTime = time(NULL);
-	
-	while(!_this->quit)
+
+	while(_this->seat == NULL && !_this->quit && !theatre->soldOut())
 	{
-		curTime = time(NULL);
+		pthread_cond_wait(&_this->waitCondition, &_this->waitMutex);
+	}
 
-		if(_this->maxWaitTime != 0)
-		{
-			if(curTime - startTime >= _this->maxWaitTime && _this->seat == NULL)
-			{
-				_this->waitTime = (int)(curTime - startTime);
-				_this->quit = true;
-				_this->leaveQueue();
+	curTime = time(NULL);
 
-				output("Customer %s waited %d seconds and left\n", _this->name.c_str(), curTime - startTime);
-				break;
-			}
-		}
-		
-		if(theatre->soldOut() && _this->seat == NULL)
+	pthread_mutex_unlock(&_this->waitMutex);
+
+	_this->waitTime = (int)(curTime - startTime);
+/*
+	if(_this->seat == NULL && _this->maxWaitTime != 0)
+	{
+		if(curTime - startTime >= _this->maxWaitTime && _this->seat == NULL)
 		{
-			_this->waitTime = (int)(curTime - startTime);
 			_this->quit = true;
 			_this->leaveQueue();
-			break;
-		}
-		
-		if(_this->seat != NULL)
-		{
-			_this->waitTime = (int)(curTime - startTime);
-			break;
-		}
-		
-		// Wait for awhile to avoid hogging the cpu
-		sleep(1);
-		//usleep(100000);
-	}
-	_this->waitTime = (int)(curTime - startTime);
 
+			output("Customer %s waited %d seconds and left\n", _this->name.c_str(), curTime - startTime);
+		}
+	}
+*/
+	if(_this->seat == NULL && theatre->soldOut())
+	{
+		_this->quit = true;
+		_this->leaveQueue();
+		
+		output("Theatre is sold out and customer %s left\n", _this->name.c_str(), curTime - startTime);
+	}
+	
 	output("End customer %s\n", _this->name.c_str());
 
 	return NULL;
@@ -100,21 +95,41 @@ Customer::Customer(int type, int index, int maxWaitTime)
 			break;
 	}
 
-	int result = pthread_create(&this->threadId, NULL, Customer::main, this);
+	int result = pthread_cond_init(&waitCondition, NULL);
+	if(result != 0)
+	{
+		perror("Customer::waitCondition not initialized");
+	}
+
+	result = pthread_mutex_init(&waitMutex, NULL);
+	if(result != 0)
+	{
+		perror("Customer::waitMutex not initialized");
+	}
+
+	result = pthread_create(&this->threadId, NULL, Customer::main, this);
 	if(result != 0)
 	{
 		perror("Customer::pthread_create not created");
 	}
 	
-	output("Customer %s created\n", name.c_str());
+	// output("Customer %s created\n", name.c_str());
 }
 
 Customer::~Customer()
 {
 	quit = true;
+	
+	pthread_mutex_lock(&waitMutex);
+	pthread_cond_signal(&waitCondition);
+	pthread_mutex_unlock(&waitMutex);
+	
 	pthread_join(this->threadId, NULL);
 	
-	output("Customer %s deleted\n", name.c_str());
+	pthread_mutex_destroy(&waitMutex);
+	pthread_cond_destroy(&waitCondition);
+	
+	// output("Customer %s deleted\n", name.c_str());
 }
 
 void Customer::sleepForAwhile()

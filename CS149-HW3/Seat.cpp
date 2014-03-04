@@ -27,9 +27,5 @@ Seat::Seat(char row, int col)
 
 Seat::~Seat()
 {
-	output("Seat %s deleted\n", name.c_str());
-}
-
-void Seat::assign(Customer* customer)
-{
+	// output("Seat %s deleted\n", name.c_str());
 }

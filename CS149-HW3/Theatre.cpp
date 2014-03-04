@@ -50,19 +50,37 @@ Theatre::Theatre(int seatRows, int seatCols)
 	{
 		perror("Theatre::queueHMutex not initialized");
 	}
-	
+
+	result = pthread_cond_init(&queueHCondition, NULL);
+	if(result != 0)
+	{
+		perror("Seller::queueHCondition not initialized");
+	}
+
 	result = pthread_mutex_init(&queueMMutex, NULL);
 	if(result != 0)
 	{
 		perror("Theatre::queueMMutex not initialized");
 	}
-	
+
+	result = pthread_cond_init(&queueMCondition, NULL);
+	if(result != 0)
+	{
+		perror("Seller::queueMCondition not initialized");
+	}
+
 	result = pthread_mutex_init(&queueLMutex, NULL);
 	if(result != 0)
 	{
 		perror("Theatre::queueLMutex not initialized");
 	}
 	
+	result = pthread_cond_init(&queueLCondition, NULL);
+	if(result != 0)
+	{
+		perror("Seller::queueLCondition not initialized");
+	}
+
 	result = pthread_mutex_init(&seatMutex, NULL);
 	if(result != 0)
 	{
@@ -79,8 +97,11 @@ Theatre::Theatre(int seatRows, int seatCols)
 Theatre::~Theatre()
 {
 	pthread_mutex_destroy(&queueHMutex);
+	pthread_cond_destroy(&queueHCondition);
 	pthread_mutex_destroy(&queueMMutex);
+	pthread_cond_destroy(&queueMCondition);
 	pthread_mutex_destroy(&queueLMutex);
+	pthread_cond_destroy(&queueLCondition);
 	pthread_mutex_destroy(&seatMutex);
 	pthread_mutex_destroy(&sellerMutex);
 
@@ -93,8 +114,6 @@ Theatre::~Theatre()
 	}
 
 	free(seats);
-	
-	output("Theatre deleted\n");
 }
 
 void Theatre::addCustomerToQueue(Customer& customer)
@@ -103,26 +122,38 @@ void Theatre::addCustomerToQueue(Customer& customer)
 	{
 		case 1:
 			pthread_mutex_lock(&queueHMutex);
+			
 			queueH.push_back(&customer);
-			pthread_mutex_unlock(&queueHMutex);
 
 			output("Customer %s in queue H\n",customer.name.c_str());
+
+			pthread_cond_broadcast(&queueHCondition);
+			
+			pthread_mutex_unlock(&queueHMutex);
 			break;
 
 		case 2:
-			pthread_mutex_lock(&queueHMutex);
+			pthread_mutex_lock(&queueMMutex);
+			
 			queueM.push_back(&customer);
-			pthread_mutex_unlock(&queueHMutex);
 
 			output("Customer %s in queue M\n",customer.name.c_str());
+
+			pthread_cond_broadcast(&queueMCondition);
+			
+			pthread_mutex_unlock(&queueMMutex);
 			break;
 
 		case 3:
 			pthread_mutex_lock(&queueLMutex);
+			
 			queueL.push_back(&customer);
-			pthread_mutex_unlock(&queueLMutex);
 
 			output("Customer %s in queue L\n",customer.name.c_str());
+
+			pthread_cond_broadcast(&queueLCondition);
+			
+			pthread_mutex_unlock(&queueLMutex);
 			break;
 	}
 }
@@ -355,6 +386,11 @@ Seat* Theatre::assignSeatToCustomer(Customer* customer)
 	   
 	pthread_mutex_unlock(&seatMutex);
 	
+	if(availableSeats == 0)
+	{
+		sendCustomersAway();
+	}
+	
 	return assignedSeat;
 }
 
@@ -394,6 +430,31 @@ void Theatre::removeSeller()
 	pthread_mutex_unlock(&sellerMutex);
 }
 
+void Theatre::sendCustomersAway()
+{
+	output("Theatre sold out. Send all waiting customers away...\n");
+
+	for(deque<Customer*>::const_iterator iter = queueH.begin(); iter != queueH.end(); iter++)
+	{
+		pthread_mutex_lock(&(*iter)->waitMutex);
+		pthread_cond_signal(&(*iter)->waitCondition);
+		pthread_mutex_unlock(&(*iter)->waitMutex);
+	}
+
+	for(deque<Customer*>::const_iterator iter = queueM.begin(); iter != queueM.end(); iter++)
+	{
+		pthread_mutex_lock(&(*iter)->waitMutex);
+		pthread_cond_signal(&(*iter)->waitCondition);
+		pthread_mutex_unlock(&(*iter)->waitMutex);
+	}
+
+	for(deque<Customer*>::const_iterator iter = queueL.begin(); iter != queueL.end(); iter++)
+	{
+		pthread_mutex_lock(&(*iter)->waitMutex);
+		pthread_cond_signal(&(*iter)->waitCondition);
+		pthread_mutex_unlock(&(*iter)->waitMutex);
+	}
+}
 
 
 

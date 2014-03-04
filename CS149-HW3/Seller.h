@@ -10,6 +10,7 @@
 #define __CS149_HW3__Seller__
 
 #include <deque>
+#include <pthread.h>
 #include <string>
 
 using namespace std;
@@ -26,6 +27,7 @@ public:
 	
 private:
 	static void *main(void* param);
+	void setup();
 
 public:
 	pthread_t threadId;
@@ -33,6 +35,8 @@ public:
 	int type;
 	string name;
 	deque<Customer>* customers;
+	pthread_mutex_t *waitMutex;
+	pthread_cond_t *waitCondition;
 };
 
 #endif /* defined(__CS149_HW3__Seller__) */

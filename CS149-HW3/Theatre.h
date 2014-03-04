@@ -37,17 +37,14 @@ public:
 	int soldSeats;
 	
 private:
+	void sendCustomersAway();
+	
 	int rows;
 	int cols;
 	Seat* *seats;
 	deque<Customer*> queueH;
 	deque<Customer*> queueM;
 	deque<Customer*> queueL;
-	pthread_mutex_t queueHMutex;
-	pthread_mutex_t queueMMutex;
-	pthread_mutex_t queueLMutex;
-	pthread_mutex_t seatMutex;
-	pthread_mutex_t sellerMutex;
 	int seatHRow;
 	int seatHCol;
 	int seatMRow;
@@ -55,6 +52,15 @@ private:
 	int seatMCol;
 	int seatLRow;
 	int seatLCol;
+public:
+	pthread_mutex_t queueHMutex;
+	pthread_cond_t queueHCondition;
+	pthread_mutex_t queueMMutex;
+	pthread_cond_t queueMCondition;
+	pthread_mutex_t queueLMutex;
+	pthread_cond_t queueLCondition;
+	pthread_mutex_t seatMutex;
+	pthread_mutex_t sellerMutex;
 };
 
 #endif /* defined(__CS149_HW3__Theatre__) */

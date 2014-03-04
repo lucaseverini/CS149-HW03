@@ -21,8 +21,6 @@ class Seat
 public:
 	Seat(char row, int col);
 	~Seat();
-	
-	void assign(Customer* customer);
 
 private:
 	char row;

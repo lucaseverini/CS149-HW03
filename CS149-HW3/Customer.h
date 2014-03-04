@@ -9,6 +9,7 @@
 #ifndef __CS149_HW3__Customer__
 #define __CS149_HW3__Customer__
 
+#include <pthread.h>
 #include <string>
 
 using namespace std;
@@ -39,6 +40,8 @@ public:
 	Seat* seat;
 	int waitTime;
 	int maxWaitTime;
+	pthread_mutex_t waitMutex;
+	pthread_cond_t waitCondition;
 };
 
 #endif /* defined(__CS149_HW3__Customer__) */

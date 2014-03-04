@@ -75,6 +75,7 @@ int main(int argc, const char * argv[])
 
 	output("Creating Sellers...\n");
 	sellers.push_back(new Seller(1, 1));
+
 	sellers.push_back(new Seller(2, 1));
 	sellers.push_back(new Seller(2, 2));
 	sellers.push_back(new Seller(2, 3));
@@ -90,7 +91,7 @@ int main(int argc, const char * argv[])
 		customers.push_back(new Customer(1, idx, maxWaitTime));
 		totCustomers++;
 	}
-	
+
 	for(int idx = 1; idx <= customersForSeller * 3; idx++)
 	{
 		customers.push_back(new Customer(2, idx, maxWaitTime));
