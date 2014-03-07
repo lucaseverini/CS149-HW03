@@ -4,7 +4,7 @@
  * File:            Seat.h
  * Purpose:         Header File for Seat.cpp
  * Start date:      3/6/14
- * Programmer:      Luca Severini
+ * Programmer:      Luca Severini, Romeo Stevens, Arash Zahoory
  *
  ******************************************************
  */

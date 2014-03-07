@@ -4,7 +4,7 @@
  * File:            Customer.h
  * Purpose:         Header for Customer Class
  * Start date:      3/6/14
- * Programmer:      Luca Severini
+ * Programmer:      Luca Severini, Romeo Stevens, Arash Zahoory
  *
  ******************************************************
  */

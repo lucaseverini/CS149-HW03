@@ -4,7 +4,7 @@
  * File:            main.h
  * Purpose:         main header
  * Start date:      3/6/14
- * Programmer:      Luca Severini
+ * Programmer:      Luca Severini, Romeo Stevens, Arash Zahoory
  *
  ******************************************************
  */
@@ -17,6 +17,3 @@
 extern Theatre* theatre;
 
 #endif /* defined(__CS149_HW3__main_h) */
-
-
-//test

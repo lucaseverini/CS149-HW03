@@ -4,7 +4,7 @@
  * File:            Output.cpp
  * Purpose:         Allows output to be streamlined into one function
  * Start date:      3/6/14
- * Programmer:      Luca Severini
+ * Programmer:      Luca Severini, Romeo Stevens, Arash Zahoory
  *
  ******************************************************
  */

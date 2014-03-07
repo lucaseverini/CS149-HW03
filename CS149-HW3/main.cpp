@@ -4,7 +4,7 @@
  * File:            main.cpp
  * Purpose:         main class
  * Start date:      3/6/14
- * Programmer:      Luca Severini
+ * Programmer:      Luca Severini, Romeo Stevens, Arash Zahoory
  *
  ******************************************************
 */

@@ -4,7 +4,7 @@
  * File:            Theatre.h
  * Purpose:         Header for Theatre Class
  * Start date:      3/6/14
- * Programmer:      Luca Severini
+ * Programmer:      Luca Severini, Romeo Stevens, Arash Zahoory
  *
  ******************************************************
  */

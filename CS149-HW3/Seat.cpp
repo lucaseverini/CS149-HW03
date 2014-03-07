@@ -4,7 +4,7 @@
  * File:            Seat.cpp
  * Purpose:         Represents seat objects
  * Start date:      3/6/14
- * Programmer:      Luca Severini
+ * Programmer:      Luca Severini, Romeo Stevens, Arash Zahoory
  *
  ******************************************************
  */
