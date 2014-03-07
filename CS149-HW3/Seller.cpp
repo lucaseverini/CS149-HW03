@@ -1,10 +1,13 @@
-//
-//  Seller.cpp
-//  CS149-HW3
-//
-//  Created by Luca Severini on 2/28/14.
-//  Copyright (c) 2014 Luca Severini. All rights reserved.
-//
+/******************************************************
+ * Copyright (c):   2014 Luca Severini. All rights reserved.
+ * Project:         CS 149 Hw3
+ * File:            Seller.cpp
+ * Purpose:         Seller class, provides context for seller threads
+ * Start date:      3/6/14
+ * Programmer:      Luca Severini
+ *
+ ******************************************************
+ */
 
 #include <pthread.h>
 #include <cstdlib>
@@ -19,6 +22,10 @@
 
 using namespace std;
 
+/* PURPOSE:  Seller main function
+ RECEIVES:   context, recieved as void, but it is a pointer to a Seller object
+ REMARKS: The Seller constructor utilizes this function as the procedure to follow when a Seller pthread is created, a seller mutex is used to prevent any critical region conflict between tickets that are being sold.
+ */
 void *Seller::main(void* context)
 {
 	Seller* _this = (Seller*)context;
@@ -30,7 +37,7 @@ void *Seller::main(void* context)
 	while(true)
 	{
 		pthread_mutex_lock(_this->waitMutex);
-		pthread_cond_wait(_this->waitCondition, _this->waitMutex);
+		pthread_cond_wait(_this->waitCondition, _this->waitMutex);//wait for customers
 		pthread_mutex_unlock(_this->waitMutex);
 		
 		Customer* customer = theatre->getNextCustomerFromQueue(_this->type);
@@ -55,6 +62,11 @@ void *Seller::main(void* context)
 	return NULL;
 }
 
+/*-----------------------------------------------*/
+/* PURPOSE:  Constructor for Seller
+ RECEIVES:   type: the type of Seller (high, medium, low priority), index: the 'identity' of the seller when multiple of same type exist.
+ REMARKS: Creates a pthread for a Seller depending on the type of Seller
+ */
 Seller::Seller(int type, int index)
 :	type(type),
 	quit(false),
@@ -85,10 +97,9 @@ Seller::Seller(int type, int index)
 	{
 		perror("Seller::pthread_create not created");
 	}
-
-	// output("Seller %s created\n", name.c_str());
 }
 
+//Clean up
 Seller::~Seller()
 {
 	quit = true;
@@ -97,8 +108,14 @@ Seller::~Seller()
 	// output("Seller %s deleted\n", name.c_str());
 }
 
+/*-----------------------------------------------*/
+/* PURPOSE:  Simulates the sale of one ticket to a customer by specific seller
+ RECEIVES:   A pointer to an instance of a customer object
+ REMARKS: Creates a pthread for a Seller depending on the type of Seller
+ */
 void Seller::sellTicketToCustomer(Customer* customer)
 {
+    //A ticket is sold to a customer, allows seller to pause for appropriate representative time
 	Seat *assignedSeat = theatre->assignSeatToCustomer(customer);
 	if(assignedSeat != NULL)
 	{
@@ -127,12 +144,17 @@ void Seller::sellTicketToCustomer(Customer* customer)
 		output("Seller %s sold ticket to customer %s in %d second(s)\n", name.c_str(), customer->name.c_str(), sleepVal);		
 		output("Available seats: %d\n", theatre->availableSeats);
 		
+        //provides wait condition for specific customer in line
 		pthread_mutex_lock(&customer->waitMutex);
 		pthread_cond_signal(&customer->waitCondition);
 		pthread_mutex_unlock(&customer->waitMutex);
 	}
 }
 
+/*-----------------------------------------------*/
+/* PURPOSE:  Sets up the seller Mutexes based on the type of seller
+ REMARKS: This is the last step that contributes to creating an instance of Seller
+ */
 void Seller::setup()
 {
 	switch(type)

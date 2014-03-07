@@ -1,10 +1,13 @@
-//
-//  Theatre.h
-//  CS149-HW3
-//
-//  Created by Luca Severini on 2/28/14.
-//  Copyright (c) 2014 Luca Severini. All rights reserved.
-//
+/******************************************************
+ * Copyright (c):   2014 Luca Severini. All rights reserved.
+ * Project:         CS 149 Hw3
+ * File:            Theatre.h
+ * Purpose:         Header for Theatre Class
+ * Start date:      3/6/14
+ * Programmer:      Luca Severini
+ *
+ ******************************************************
+ */
 
 #ifndef __CS149_HW3__Theatre__
 #define __CS149_HW3__Theatre__
