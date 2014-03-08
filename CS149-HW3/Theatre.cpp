@@ -151,7 +151,7 @@ Theatre::~Theatre()
  */
 void Theatre::addCustomerToQueue(Customer& customer)
 {
-    //Depending on customer priority, add to correct queue, broadcast mutex condition
+    // Depending on customer priority, add to correct queue, broadcast mutex condition
 	switch(customer.type)
 	{
 		case 1://high priority
@@ -159,7 +159,7 @@ void Theatre::addCustomerToQueue(Customer& customer)
 			
 			queueH.push_back(&customer);
 
-			output("Customer %s in queue H\n",customer.name.c_str());
+			output(true, "Customer %s in queue H\n",customer.name.c_str());
 
 			pthread_cond_broadcast(&queueHCondition);
 			
@@ -171,7 +171,7 @@ void Theatre::addCustomerToQueue(Customer& customer)
 			
 			queueM.push_back(&customer);
 
-			output("Customer %s in queue M\n",customer.name.c_str());
+			output(true, "Customer %s in queue M\n",customer.name.c_str());
 
 			pthread_cond_broadcast(&queueMCondition);
 			
@@ -183,7 +183,7 @@ void Theatre::addCustomerToQueue(Customer& customer)
 			
 			queueL.push_back(&customer);
 
-			output("Customer %s in queue L\n",customer.name.c_str());
+			output(true, "Customer %s in queue L\n",customer.name.c_str());
 
 			pthread_cond_broadcast(&queueLCondition);
 			
@@ -211,7 +211,7 @@ void Theatre::removeCustomerFromQueue(Customer& customer)
 				{
 					queueH.erase(iter);
 					
-					output("Customer %s left queue H\n",customer.name.c_str());
+					output(true, "Customer %s left queue H\n",customer.name.c_str());
 					break;
 				}
 			}
@@ -228,7 +228,7 @@ void Theatre::removeCustomerFromQueue(Customer& customer)
 				{
 					queueM.erase(iter);
 										
-					output("Customer %s left queue M\n",customer.name.c_str());
+					output(true, "Customer %s left queue M\n",customer.name.c_str());
 					break;
 				}
 			}
@@ -245,7 +245,7 @@ void Theatre::removeCustomerFromQueue(Customer& customer)
 				{
 					queueL.erase(iter);
 					
-					output("Customer %s left queue L\n",customer.name.c_str());
+					output(true, "Customer %s left queue L\n",customer.name.c_str());
 					break;
 				}
 			}
@@ -289,7 +289,7 @@ Customer* Theatre::getNextCustomerFromQueue(int customerType)
 			}
 			else
 			{
-				output("Queue H is empty\n");
+				output(true, "Queue H is empty\n");
 			}
 			
 			pthread_mutex_unlock(&queueHMutex);
@@ -309,7 +309,7 @@ Customer* Theatre::getNextCustomerFromQueue(int customerType)
 			}
 			else
 			{
-				output("Queue M is empty\n");
+				output(true, "Queue M is empty\n");
 			}
 
 			pthread_mutex_unlock(&queueHMutex);
@@ -329,7 +329,7 @@ Customer* Theatre::getNextCustomerFromQueue(int customerType)
 			}
 			else
 			{
-				output("Queue L is empty\n");
+				output(true, "Queue L is empty\n");
 			}
 
 			pthread_mutex_unlock(&queueLMutex);
@@ -459,7 +459,9 @@ Seat* Theatre::assignSeatToCustomer(Customer* customer)
 				break;
 		}
 	}
-	   
+
+	printSeats("Current seat map:");
+
 	pthread_mutex_unlock(&seatMutex);
 		
 	return assignedSeat;
@@ -469,9 +471,11 @@ Seat* Theatre::assignSeatToCustomer(Customer* customer)
 /* PURPOSE: prints out the the arrangement of seats
  REMARKS: It converts the seating arrangement into a String stream, and uses the output function of the output class to print the seating arrangement
  */
-void Theatre::printSeats()
+void Theatre::printSeats(const char *message)
 {
 	stringstream outStream;
+	
+	outStream << message << endl;
 	
 	for(int row = 0; row < rows; row++)
 	{
@@ -484,7 +488,7 @@ void Theatre::printSeats()
 		outStream << endl;
 	}
 	
-	output("%s", outStream.str().c_str());
+	output(false, "%s", outStream.str().c_str());
 }
 
 /*-----------------------------------------------*/
@@ -517,7 +521,7 @@ void Theatre::removeSeller()
  */
 void Theatre::sendWaitingCustomersAway()
 {
-	output("Theatre sold out. Send all waiting customers away...\n");
+	output(true, "Theatre sold out. Send all waiting customers away...\n");
 
 	for(deque<Customer*>::const_iterator iter = queueH.begin(); iter != queueH.end(); iter++)
 	{
@@ -547,7 +551,7 @@ void Theatre::sendWaitingCustomersAway()
  */
 void Theatre::releaseSellers()
 {
-	output("Theatre sold out. Release all sellers...\n");
+	output(true, "Theatre sold out. Release all sellers...\n");
 	
 	pthread_mutex_lock(&queueHMutex);
 	pthread_cond_broadcast(&queueHCondition);

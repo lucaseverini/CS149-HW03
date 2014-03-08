@@ -15,8 +15,6 @@
 #include "Customer.h"
 #include "Output.h"
 #include "main.h"
-#include <time.h>
-#include <sys/time.h>
 #include <sys/errno.h>
 
 using namespace std;
@@ -29,63 +27,67 @@ void *Customer::main(void* context)
 {
 	Customer* _this = (Customer*)context;
 	
-	output("Start customer %s\n", _this->name.c_str());
+	output(true, "Customer %s starts\n", _this->name.c_str());
 	
 	_this->sleepForAwhile();
 	
-    //Customer is placed in line
-	_this->goInQueue();
-	output("Customer %s is waiting in line...\n", _this->name.c_str());
-    
-	pthread_mutex_lock(&_this->waitMutex);
-    
-	time_t startTime = time(NULL);
-	time_t curTime = time(NULL);
-	
-    //As long as the Customer has not waited too long, and there are tickets to buy
-    //define customer state based on given circumstances
 	bool waitExpired = false;
-	while(_this->seat == NULL && !waitExpired && !theatre->soldOut())
+
+	if(!theatre->soldOut())
 	{
-		if(_this->maxWaitTime != 0)
+		//Customer is placed in line
+		_this->goInQueue();
+		output(true, "Customer %s is waiting in line...\n", _this->name.c_str());
+		
+		pthread_mutex_lock(&_this->waitMutex);
+		
+		time_t startTime = time(NULL);
+		time_t curTime = time(NULL);
+		
+		//As long as the Customer has not waited too long, and there are tickets to buy
+		//define customer state based on given circumstances
+		while(_this->seat == NULL && !waitExpired && !theatre->soldOut())
 		{
-			struct timespec timeToWait;
-			clock_gettime(&timeToWait);
-			timeToWait.tv_sec += (long)_this->maxWaitTime;
-            
-			if(pthread_cond_timedwait(&_this->waitCondition, &_this->waitMutex, &timeToWait) == ETIMEDOUT)
+			if(_this->maxWaitTime != 0)
 			{
-				waitExpired = true;
+				struct timespec timeToWait;
+				clock_gettime(&timeToWait);
+				timeToWait.tv_sec += (long)_this->maxWaitTime;
+				
+				if(pthread_cond_timedwait(&_this->waitCondition, &_this->waitMutex, &timeToWait) == ETIMEDOUT)
+				{
+					waitExpired = true;
+				}
+			}
+			else
+			{
+				pthread_cond_wait(&_this->waitCondition, &_this->waitMutex);
 			}
 		}
-		else
-		{
-			pthread_cond_wait(&_this->waitCondition, &_this->waitMutex);
-		}
-	}
-    
-	curTime = time(NULL);//Current time is set for moment customer leaves line
-    
-	pthread_mutex_unlock(&_this->waitMutex);
-    
-	_this->waitTime = (int)(curTime - startTime);
-    
+		
+		curTime = time(NULL);//Current time is set for moment customer leaves line
+		
+		pthread_mutex_unlock(&_this->waitMutex);
+		
+		_this->waitTime = (int)(curTime - startTime);
+    }
+	
 	if(_this->seat == NULL && theatre->soldOut())//Customer leaves if sold out
 	{
 		_this->quit = true;
 		_this->leaveQueue();
 		
-		output("Theatre is sold out and customer %s left\n", _this->name.c_str(), curTime - startTime);
+		output(true, "Theatre is sold out and customer %s left\n", _this->name.c_str(), _this->waitTime);
 	}
 	else if(_this->seat == NULL && waitExpired)//Customer leaves if waited too long
 	{
 		_this->quit = true;
 		_this->leaveQueue();
 		
-		output("Customer %s waited %d seconds and left\n", _this->name.c_str(), curTime - startTime);
+		output(true, "Customer %s waited %d seconds and left\n", _this->name.c_str(), _this->waitTime);
 	}
 	
-	output("End customer %s\n", _this->name.c_str());
+	output(true, "Customer %s stops\n", _this->name.c_str());
     
 	return NULL;
 }
@@ -168,7 +170,7 @@ Customer::~Customer()
 void Customer::sleepForAwhile()
 {
 	int sleepVal = rand() % 59;
-	printf("Customer %s sleeps for %d seconds\n", name.c_str(), sleepVal);
+	output(true, "Customer %s sleeps/wait for %d seconds\n", name.c_str(), sleepVal);
 	sleep(sleepVal);
 }
 
@@ -187,22 +189,4 @@ void Customer::leaveQueue()
 {
 	theatre->removeCustomerFromQueue(*this);
 }
-
-// OS X does not have clock_gettime so we simulate it with clock_get_time
-static int clock_gettime(struct timespec *ts)
-{
-    struct timeval now;
-	
-    int result = gettimeofday(&now, NULL);
-	if(result != 0)
-	{
-		return result;
-	}
-	
-    ts->tv_sec = now.tv_sec;
-	ts->tv_nsec = now.tv_usec * 1000;
-	
-    return 0;
-}
-
 

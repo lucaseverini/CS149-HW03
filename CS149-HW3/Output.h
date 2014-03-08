@@ -12,6 +12,6 @@
 #ifndef CS149_HW3_Output_h
 #define CS149_HW3_Output_h
 
-void output(const char* format, ...);
+void output(const bool printTime, const char* format, ...);
 
 #endif

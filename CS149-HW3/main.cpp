@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 #include <unistd.h>
+#include <time.h>
+#include <sys/time.h>
 #include "Theatre.h"
 #include "Customer.h"
 #include "Seller.h"
@@ -21,6 +23,8 @@
 using namespace std;
 
 Theatre* theatre;
+int elapsedSeconds = 0;
+
 /*----------------------------------------------------------*/
 /* Main entry point to the program.  Customer and Seller threads are created here
  * Control is then given to the sellers, who sell tickets until appropriate conditions 
@@ -28,17 +32,17 @@ Theatre* theatre;
  */
 int main(int argc, const char * argv[])
 {
-	output("CS149 Assignment 3\n");
-	output("March-4-2014\n");
-	output("Team: Kamikaze\n\n");
+	output(false, "CS149 Assignment 3\n");
+	output(false, "March-7-2014\n");
+	output(false, "Team: Kamikaze\n\n");
     
 	vector<Seller*> sellers;
 	vector<Customer*> customers;
-	int customersForSeller = 15;
-    int runTime = 30;
+	int customersForSeller = 10;
+    int runTime = 60;
 	int seatCols = 10;
 	int seatRows = 10;
-	int maxWaitTime = 270;
+	int maxWaitTime = 10;
 	
 	int totSeats = 0;
 	int totCustomers = 0;
@@ -71,21 +75,21 @@ int main(int argc, const char * argv[])
 	totSeats = seatCols * seatRows;
 	totCustomers = customersForSeller * 10;
     
-	output("Theatre with %d seats (%dx%d)\n", totSeats, seatCols, seatRows);
-	output("%d customer(s) for seller\n", customersForSeller);
-	output("Total customers: %d\n", totCustomers);
-	output("Max. customer waiting in line: %d second(s)\n", maxWaitTime);
-	output("Run-time %d second(s)\n", runTime);
+	output(false, "Theatre with %d seats (%dx%d)\n", totSeats, seatCols, seatRows);
+	output(false, "%d customer(s) for seller\n", customersForSeller);
+	output(false, "Total customers: %d\n", totCustomers);
+	output(false, "Max. customer waiting in line: %d second(s)\n", maxWaitTime);
+	output(false, "Run-time %d second(s)\n", runTime);
     
 	srand((unsigned int)time(NULL));
 	
     //Initializing the theatre
 	theatre = new Theatre(seatRows, seatCols);
     
-	theatre->printSeats();
+	theatre->printSeats("Initial seat map:");
     
     //Creating Sellers
-	output("Creating Sellers...\n");
+	//output("Creating Sellers...\n");
 	sellers.push_back(new Seller(1, 1));
 	sellers.push_back(new Seller(2, 1));
 	sellers.push_back(new Seller(2, 2));
@@ -115,18 +119,18 @@ int main(int argc, const char * argv[])
 		customers.push_back(new Customer(3, idx, maxWaitTime));
 	}
     
-	output("Sale started\n");
+	output(true, "Sale started\n");
     
     //Stop program if all seats are sold, or no customers left
-	for(int idx = runTime; idx > 0; idx--)
+	for(int idx = runTime; idx > 0; idx--, elapsedSeconds++)
 	{
-		output("%d second(s) to the end...\n", idx);
+		output(true, "%d second(s) to the end...\n", idx);
 		
 		sleep(1);
 		
 		if(theatre->activeSellers == 0)
 		{
-			output("All seats have been sold\n");
+			output(true, "All seats have been sold\n");
             
 			theatre->sellTerminated = true;
 			theatre->sendWaitingCustomersAway();
@@ -136,7 +140,7 @@ int main(int argc, const char * argv[])
         
 		if(theatre->processedCustomers == totCustomers)
 		{
-			output("All expected customers have been queued\n");
+			output(true, "All expected customers have been queued\n");
             
 			theatre->sellTerminated = true;
 			theatre->sendWaitingCustomersAway();
@@ -145,11 +149,11 @@ int main(int argc, const char * argv[])
 		}
 	}
 	
-	output("Sale terminated\n");
+	output(true, "Sale terminated\n");
 	
-	theatre->printSeats();
+	theatre->printSeats("Final seat map:");
 	
-	output("Sold seats: %d\n", theatre->soldSeats);
+	output(false, "Sold seats: %d\n", theatre->soldSeats);
 	
     //Keep track of unhappy customers
 	int unseatedCustomers = 0;
@@ -168,12 +172,25 @@ int main(int argc, const char * argv[])
 			}
 		}
 	}
-	output("Unseated customers: %d\n", unseatedCustomers);
-	output("Customers who waited %d second(s) or more: %d\n", maxWaitTime, unhappyCustomers);
+	output(false, "Unseated customers: %d\n", unseatedCustomers);
+	output(false, "Customers who waited %d second(s) or more: %d\n", maxWaitTime, unhappyCustomers);
+	
+	if(theatre->soldSeats + unseatedCustomers + unhappyCustomers != totCustomers)
+	{
+		output(false, "Untracked/lost customers: %d\n", totCustomers - theatre->soldSeats + unseatedCustomers + unhappyCustomers);
+	}
+	else
+	{
+		output(false, "No untracked/lost customers\n");
+	}
 	
     //Clean up Seller iterator
 	for(vector<Seller*>::const_reverse_iterator iter = sellers.crbegin(); iter != sellers.crend(); iter++)
 	{
+		while((*iter)->sellPending)
+		{
+			usleep(100000000);
+		}
 		delete *iter;
 	}
     
@@ -185,8 +202,27 @@ int main(int argc, const char * argv[])
     
 	delete theatre;
 	
-	output("Done.\n");
+	output(false, "Done.\n");
     
     return 0;
 }
+
+// OS X does not have clock_gettime so we simulate it with clock_get_time
+int clock_gettime(struct timespec *ts)
+{
+    struct timeval now;
+	
+    int result = gettimeofday(&now, NULL);
+	if(result != 0)
+	{
+		return result;
+	}
+	
+    ts->tv_sec = now.tv_sec;
+	ts->tv_nsec = now.tv_usec * 1000;
+	
+    return 0;
+}
+
+
 

@@ -33,7 +33,7 @@ public:
 	bool soldOut();
 	void addSeller();
 	void removeSeller();
-	void printSeats();
+	void printSeats(const char* message);
 	void sendWaitingCustomersAway();
 	void releaseSellers();
 

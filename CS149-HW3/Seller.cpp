@@ -30,7 +30,7 @@ void *Seller::main(void* context)
 {
 	Seller* _this = (Seller*)context;
 	
-	output("Start seller %s\n", _this->name.c_str());
+	output(true, "Seller %s arrived\n", _this->name.c_str());
 	
 	_this->setup();
 	
@@ -48,16 +48,25 @@ void *Seller::main(void* context)
 			customer = theatre->getNextCustomerFromQueue(_this->type);
 		}
 		
-		if(theatre->soldOut() || theatre->sellTerminated)
+		if(theatre->soldOut())
 		{
 			_this->quit = true;
+			
+			output(true, "Theatre is sold out and seller %s stops\n", _this->name.c_str());
+			break;
+		}
+		else if(theatre->sellTerminated)
+		{
+			_this->quit = true;
+			
+			output(true, "Sale terminated and seller %s stops\n", _this->name.c_str());
 			break;
 		}
 	}
 
 	theatre->removeSeller();
 
-	output("End seller %s\n", _this->name.c_str());
+	output(true, "Seller %s left\n", _this->name.c_str());
 
 	return NULL;
 }
@@ -70,7 +79,8 @@ void *Seller::main(void* context)
 Seller::Seller(int type, int index)
 :	type(type),
 	quit(false),
-	customers(NULL)
+	customers(NULL),
+	sellPending(false)
 {
 	char str[10];
 	
@@ -103,6 +113,11 @@ Seller::Seller(int type, int index)
 Seller::~Seller()
 {
 	quit = true;
+
+	pthread_mutex_lock(waitMutex);
+	pthread_cond_signal(waitCondition);
+	pthread_mutex_unlock(waitMutex);
+
 	pthread_join(this->threadId, NULL);
 
 	// output("Seller %s deleted\n", name.c_str());
@@ -115,6 +130,8 @@ Seller::~Seller()
  */
 void Seller::sellTicketToCustomer(Customer* customer)
 {
+	sellPending = true;
+	
     //A ticket is sold to a customer, allows seller to pause for appropriate representative time
 	Seat *assignedSeat = theatre->assignSeatToCustomer(customer);
 	if(assignedSeat != NULL)
@@ -141,14 +158,16 @@ void Seller::sellTicketToCustomer(Customer* customer)
 
 		sleep(sleepVal);
 
-		output("Seller %s sold ticket to customer %s in %d second(s)\n", name.c_str(), customer->name.c_str(), sleepVal);		
-		output("Available seats: %d\n", theatre->availableSeats);
+		output(true, "Seller %s sold ticket to customer %s in %d second(s)\n", name.c_str(), customer->name.c_str(), sleepVal);
+		// output("Available seats: %d\n", theatre->availableSeats);
 		
         //provides wait condition for specific customer in line
 		pthread_mutex_lock(&customer->waitMutex);
 		pthread_cond_signal(&customer->waitCondition);
 		pthread_mutex_unlock(&customer->waitMutex);
 	}
+	
+	sellPending = false;
 }
 
 /*-----------------------------------------------*/

@@ -15,5 +15,8 @@
 #include "Theatre.h"
 
 extern Theatre* theatre;
+extern int elapsedSeconds;
+
+extern int clock_gettime(struct timespec *ts);
 
 #endif /* defined(__CS149_HW3__main_h) */
