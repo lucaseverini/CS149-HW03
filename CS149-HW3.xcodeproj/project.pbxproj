@@ -42,6 +42,8 @@
 		81C1B18D18C280FB00B949D1 /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		81C1B18E18C28FD900B949D1 /* Seat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Seat.cpp; sourceTree = "<group>"; };
 		81C1B18F18C28FD900B949D1 /* Seat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Seat.h; sourceTree = "<group>"; };
+		81F6DFA918CAFE460040D81F /* Report.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; path = Report.rtf; sourceTree = "<group>"; };
+		81F6DFAA18CAFE780040D81F /* Output.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Output.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +61,8 @@
 			isa = PBXGroup;
 			children = (
 				817431AC18C529B300F8C2BE /* Assignment3.pdf */,
+				81F6DFA918CAFE460040D81F /* Report.rtf */,
+				81F6DFAA18CAFE780040D81F /* Output.txt */,
 				81C1B17718C1767A00B949D1 /* CS149-HW3 */,
 				81C1B17618C1767A00B949D1 /* Products */,
 			);
