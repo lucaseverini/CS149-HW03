@@ -30,7 +30,7 @@ void *Seller::main(void* context)
 {
 	Seller* _this = (Seller*)context;
 	
-	output(true, "Seller %s arrived\n", _this->name.c_str());
+	output(true, "Seller %s starts\n", _this->name.c_str());
 	
 	_this->setup();
 	
@@ -66,7 +66,7 @@ void *Seller::main(void* context)
 
 	theatre->removeSeller();
 
-	output(true, "Seller %s left\n", _this->name.c_str());
+	output(true, "Seller %s stops\n", _this->name.c_str());
 
 	return NULL;
 }
@@ -80,7 +80,7 @@ Seller::Seller(int type, int index)
 :	type(type),
 	quit(false),
 	customers(NULL),
-	sellPending(false)
+	salePending(false)
 {
 	char str[10];
 	
@@ -112,13 +112,12 @@ Seller::Seller(int type, int index)
 //Clean up
 Seller::~Seller()
 {
-	quit = true;
+	if(!quit)
+	{
+		output(true, "Seller %s stops\n", this->name.c_str());
+	}
 
-	pthread_mutex_lock(waitMutex);
-	pthread_cond_signal(waitCondition);
-	pthread_mutex_unlock(waitMutex);
-
-	pthread_join(this->threadId, NULL);
+	pthread_cancel(this->threadId);
 
 	// output("Seller %s deleted\n", name.c_str());
 }
@@ -130,7 +129,7 @@ Seller::~Seller()
  */
 void Seller::sellTicketToCustomer(Customer* customer)
 {
-	sellPending = true;
+	salePending = true;
 	
     //A ticket is sold to a customer, allows seller to pause for appropriate representative time
 	Seat *assignedSeat = theatre->assignSeatToCustomer(customer);
@@ -167,7 +166,7 @@ void Seller::sellTicketToCustomer(Customer* customer)
 		pthread_mutex_unlock(&customer->waitMutex);
 	}
 	
-	sellPending = false;
+	salePending = false;
 }
 
 /*-----------------------------------------------*/

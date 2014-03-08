@@ -187,9 +187,9 @@ int main(int argc, const char * argv[])
     //Clean up Seller iterator
 	for(vector<Seller*>::const_reverse_iterator iter = sellers.crbegin(); iter != sellers.crend(); iter++)
 	{
-		while((*iter)->sellPending)
+		while((*iter)->salePending)	// Wait for pending sales to complete...
 		{
-			usleep(100000000);
+			sleep(1);
 		}
 		delete *iter;
 	}

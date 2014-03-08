@@ -150,16 +150,15 @@ maxWaitTime(maxWaitTime)
 //Clean up
 Customer::~Customer()
 {
-	quit = true;
-	
-	pthread_mutex_lock(&waitMutex);
-	pthread_cond_signal(&waitCondition);
-	pthread_mutex_unlock(&waitMutex);
-	
-	pthread_join(this->threadId, NULL);
+	if(!quit)
+	{
+		output(true, "Customer %s stops\n", this->name.c_str());
+	}
 	
 	pthread_mutex_destroy(&waitMutex);
 	pthread_cond_destroy(&waitCondition);
+		
+	pthread_cancel(this->threadId);
 	
 	// output("Customer %s deleted\n", name.c_str());
 }

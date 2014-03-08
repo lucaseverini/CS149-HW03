@@ -37,7 +37,7 @@ public:
 	bool quit;
 	int type;
 	string name;
-	bool sellPending;
+	bool salePending;
 	deque<Customer>* customers;
 	pthread_mutex_t *waitMutex;
 	pthread_cond_t *waitCondition;
