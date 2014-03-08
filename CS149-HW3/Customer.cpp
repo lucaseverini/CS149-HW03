@@ -74,20 +74,20 @@ void *Customer::main(void* context)
 	
 	if(_this->seat == NULL && theatre->soldOut())//Customer leaves if sold out
 	{
-		_this->quit = true;
 		_this->leaveQueue();
 		
 		output(true, "Theatre is sold out and customer %s left\n", _this->name.c_str(), _this->waitTime);
 	}
 	else if(_this->seat == NULL && waitExpired)//Customer leaves if waited too long
 	{
-		_this->quit = true;
 		_this->leaveQueue();
 		
 		output(true, "Customer %s waited %d seconds and left\n", _this->name.c_str(), _this->waitTime);
 	}
 	
 	output(true, "Customer %s stops\n", _this->name.c_str());
+	
+	_this->quit = true;
     
 	return NULL;
 }
@@ -151,7 +151,9 @@ maxWaitTime(maxWaitTime)
 Customer::~Customer()
 {
 	if(!quit)
-	{
+	{		
+		pthread_cancel(this->threadId);
+
 		output(true, "Customer %s stops\n", this->name.c_str());
 	}
 	

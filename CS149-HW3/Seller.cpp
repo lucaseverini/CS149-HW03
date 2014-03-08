@@ -50,15 +50,11 @@ void *Seller::main(void* context)
 		
 		if(theatre->soldOut())
 		{
-			_this->quit = true;
-			
 			output(true, "Theatre is sold out and seller %s stops\n", _this->name.c_str());
 			break;
 		}
 		else if(theatre->sellTerminated)
 		{
-			_this->quit = true;
-			
 			output(true, "Sale terminated and seller %s stops\n", _this->name.c_str());
 			break;
 		}
@@ -67,6 +63,8 @@ void *Seller::main(void* context)
 	theatre->removeSeller();
 
 	output(true, "Seller %s stops\n", _this->name.c_str());
+	
+	_this->quit = true;
 
 	return NULL;
 }
@@ -113,11 +111,11 @@ Seller::Seller(int type, int index)
 Seller::~Seller()
 {
 	if(!quit)
-	{
+	{		
+		pthread_cancel(this->threadId);
+
 		output(true, "Seller %s stops\n", this->name.c_str());
 	}
-
-	pthread_cancel(this->threadId);
 
 	// output("Seller %s deleted\n", name.c_str());
 }
